@@ -6,7 +6,51 @@ const Home = () => {
   const [azureStatus, setAzureStatus] = useState('Checking Azure...');
   const [networkingData, setNetworkingData] = useState('Checking network...');
 
-  // ... other useEffects (for Internet and Domain)
+  useEffect(() => {
+    const ws = new WebSocket('ws://localhost:8000/internet_connection/');
+
+    ws.onopen = () => {
+      console.log('WebSocket connection opened.');
+    };
+
+    ws.onmessage = event => {
+      console.log('Received message:', event.data);
+      const data = JSON.parse(event.data);
+      console.log('data after paser:', data.connection.is_connected_to_internet);
+      setInternetStatus(JSON.stringify(data.connection.is_connected_to_internet));
+    };
+
+    ws.onclose = () => {
+      console.log('WebSocket connection closed.');
+    };
+
+    return () => {
+      ws.close();
+    };
+  }, []);
+
+  useEffect(() => {
+    const ws = new WebSocket('ws://localhost:8000/domain_connection/');
+
+    ws.onopen = () => {
+      console.log('WebSocket connection opened.');
+    };
+
+    ws.onmessage = event => {
+      console.log('Received message:', event.data);
+      const data = JSON.parse(event.data);
+      console.log('data after paser:', data);
+      setDomainStatus(JSON.stringify(data));
+    };
+
+    ws.onclose = () => {
+      console.log('WebSocket connection closed.');
+    };
+
+    return () => {
+      ws.close();
+    };
+  }, []);
 
   useEffect(() => {
     const ws = new WebSocket('ws://localhost:8000/azure_connection/');
